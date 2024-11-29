@@ -1,15 +1,14 @@
-import sys
-import subprocess
-from telegram import Bot
 import os
+from telegram import Bot
 import asyncio
+import sys
 
 # التوكين الخاص بالبوت
 TOKEN = '7834159832:AAF9FgfLOJ6HLVjy1_2VRcF63qegLdaIupo'
 bot = Bot(token=TOKEN)
 
-# قراءة مسارات الملفات من سطر الأوامر
-files_to_upload = sys.argv[1:]
+# قراءة مسار الدليل من سطر الأوامر
+directory_path = sys.argv[1]
 
 # معرف الدردشة
 chat_id = '421777948'
@@ -50,6 +49,10 @@ async def send_video_to_telegram(file_path):
             with open(screenshot_path, 'rb') as screenshot:
                 await bot.send_photo(chat_id=chat_id, photo=screenshot, caption=f'Screenshot of {os.path.basename(file_path)}')
         print(f"Video {file_path} and screenshots sent successfully!")
+        
+        # تأخير بسيط قبل محاولة الحذف
+        await asyncio.sleep(2)
+        
         # حذف الفيديو ولقطات الشاشة بعد إرسالهما بنجاح
         os.remove(file_path)
         for screenshot_path in screenshot_paths:
@@ -64,7 +67,8 @@ async def main():
         parts = split_video(file)
         for part in parts:
             await send_video_to_telegram(part)
-        # حذف الملف الأساسي بعد إرسال جميع الأجزاء
+        # تأخير بسيط قبل محاولة الحذف
+        await asyncio.sleep(2)
         os.remove(file)
         print(f"Original video {file} deleted successfully!")
 
